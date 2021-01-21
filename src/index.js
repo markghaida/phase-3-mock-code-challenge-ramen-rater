@@ -1,111 +1,96 @@
-// write your code here
+const ramenMenu = document.querySelector("#ramen-menu");
+// let ramenTest 
 
-//- GET `/ramens/:id`
-//- PATCH `/ramens/:id`
-//Constants 
-const url = "http://localhost:3000/ramens/"
-const ramenMenu = document.querySelector("#ramen-menu")
+getAllRamen();
+formEventListener();
 
-const ratingInput = document.querySelector("#rating")
-const commentInput = document.querySelector("#comment")
-const ramenForm = document.querySelector("#ramen-rating")
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    getRamens();
-
-})
-
-
-ramenForm.addEventListener("submit", (e) => {
-    // debugger
-    e.preventDefault()
-    const ramenId = parseInt(ramenForm.dataset.id) 
-    const updatedObj = {
-        rating: ratingInput.value, 
-        comment: commentInput.value
-    }
-
-    updateRamen(updatedObj, e.target.dataset.id)
-    e.target.reset()
-    // console.log(e)
-})
-
-
-//See all ramen images in the `div` with the id of `ramen-menu`. 
-//Then, display the image for each of the ramen using an an `img` tag inside the `#ramen-menu` div.
-
-
-const renderImage = (ramen) => {
-    const img = document.createElement("img")
-    // console.log(ramen)
-    img.src = ramen.image; 
-    ramenMenu.append(img);
-
-    img.addEventListener("click", () => {
-        getRamen(ramen);
-    });     
-    
-    
-}
-
-// get each ramen with forEach
-const parseRamen = (ramens) => {
-    ramens.forEach(renderImage);
-}
-
-const getRamen = (ramen) => {
-    fetch(`${url}${ramen.id}`)
-    .then(response => response.json())
-    .then(ramenDetails);
-}
-
-// Click on an image from the `#ramen-menu` div and see all the info about that 
-const ramenDetails = (ramen) => {
-    // console.log(ramen)
-    // const ramenDetail = document.querySelector("#ramen-detail")
-    const secondImage = document.querySelector(".detail-image")
-    const h2 = document.querySelector(".name")
-    const h3 = document.querySelector(".restaurant")
-    
-    secondImage.src = ramen.image;
-    secondImage.alt = ramen.name;
-    h2.textContent = ramen.name;
-    h3.textContent = ramen.restaurant;
-
-    ratingInput.value = ramen.rating;
-    commentInput.value = ramen.comment;
-    ramenForm.dataset.id = ramen.id 
-
-
-}
-
-
-function updateRamen(updatedObj, id){
-    // debugger
-    fetch(`${url}${id}`, {
-    method: 'PATCH',
-    headers: {
-            'Content-Type': 'application/json'
-          },
-        body: JSON.stringify(updatedObj)
-      })
-      .then(console.log)
-      
-    //   .then(data => console.log(data));
-      
-}
-
-// const reRender = (newObj) => {
-//     console.log(newObj)
-// }
-
-//When the page loads, request the data from the server to get all the ramen objects.
-function getRamens(){
+function getAllRamen(){
     fetch("http://localhost:3000/ramens")
     .then(response => response.json())
-    .then(parseRamen);
+    .then(ramenItems)
 }
 
+function ramenItems(ramenArr){
+    ramenArr.forEach(ramen => {
+       //helper function to create image
+        renderImage(ramen);
+    })
+}
 
+function renderImage(ramen){
+    const img = document.createElement("img")
+    img.src = ramen.image 
+    img.alt = ramen.name 
+    img.dataset.id = ramen.id 
+    ramenMenu.append(img)
 
+    img.addEventListener("click", function(e){
+        //helper method to get fetch with id request 
+        getRamen(e.target.dataset.id);
+    })
+}
+
+function getRamen(ramenId){
+    fetch(`http://localhost:3000/ramens/${ramenId}`)
+    .then(response => response.json())
+    .then(ramen => {
+        renderDetails(ramen)
+    })
+}
+
+function renderDetails(ramen){
+    // const ramenDetail = document.querySelector("#ramen-detail");
+    const img = document.querySelector(".detail-image");
+    const h2 = document.querySelector(".name");
+    const h3 = document.querySelector(".restaurant");
+    const ratingInput = document.querySelector("#rating")
+    ratingInput.value = ramen.rating 
+    const commentInput = document.querySelector("#comment")
+    commentInput.value = ramen.comment
+    img.src = ramen.image;
+    img.alt = ramen.name; 
+    h2.textContent = ramen.name
+    h3.textContent = ramen.restaurant 
+    const ramenForm = document.querySelector("#ramen-rating")
+    ramenForm.dataset.id = ramen.id;
+}
+
+function formEventListener(){
+
+    const ramenForm = document.querySelector("#ramen-rating")
+    ramenForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        // console.log(e);
+        const newRating = document.querySelector("#rating").value
+        const newComment = document.querySelector("#comment").value
+        // const r = e.target.rating.value    
+        const updatedObj = {
+            id: parseInt(ramenForm.dataset.id),
+            rating: newRating,
+            comment: newComment
+        }
+
+        updateRamen(updatedObj);
+        e.target.reset();
+    })
+}
+
+function updateRamen(updatedObj){
+
+    fetch(`http://localhost:3000/ramens/${updatedObj.id}`, {
+  method: 'PATCH',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(updatedObj),
+})
+.then(response => response.json())
+.then(updatedObj => {
+    const ratingInput = document.querySelector("#rating")
+    const commentInput = document.querySelector("#comment")
+    ratingInput.value = updatedObj.rating
+    commentInput.value = updatedObj.comment
+    
+})
+
+}

@@ -5,16 +5,16 @@
       "name": "Shoyu Ramen",
       "restaurant": "Nonono",
       "image": "./assets/ramen/shoyu.jpg",
-      "rating": "8",
-      "comment": "Delish."
+      "rating": "10",
+      "comment": "Supa Delishhhhh"
     },
     {
       "id": 2,
       "name": "Naruto Ramen",
       "restaurant": "Naruto",
       "image": "./assets/ramen/naruto.jpg",
-      "rating": "10",
-      "comment": "My absolute fave!"
+      "rating": "11",
+      "comment": "My absolute fave in the world!!!"
     },
     {
       "id": 3,
